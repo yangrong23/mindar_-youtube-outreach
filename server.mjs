@@ -20,7 +20,10 @@ const CONFIG = {
   company: process.env.COMPANY_NAME || "Mindar",
   ultraOffer: process.env.ULTRA_OFFER || "6 months of Ultra",
   minSubscribers: Number(process.env.MIN_SUBSCRIBERS || 2000),
-  maxSubscribers: Number(process.env.MAX_SUBSCRIBERS || 20000)
+  maxSubscribers: Number(process.env.MAX_SUBSCRIBERS || 20000),
+  demoEmail: process.env.DEMO_LOGIN_EMAIL || "123@gmail.com",
+  demoPassword: process.env.DEMO_LOGIN_PASSWORD || "123@gmail.com",
+  sessionSecret: process.env.SESSION_SECRET || crypto.randomBytes(32).toString("hex")
 };
 
 fs.mkdirSync(DATA_DIR, { recursive: true });
@@ -60,6 +63,10 @@ function html(res, body) {
   res.writeHead(200, { "Content-Type": "text/html; charset=utf-8" });
   res.end(body);
 }
+function redirect(res, location) {
+  res.writeHead(302, { Location: location });
+  res.end();
+}
 function body(req) {
   return new Promise((resolve, reject) => {
     let value = "";
@@ -78,6 +85,75 @@ function id() {
 }
 function esc(value = "") {
   return String(value).replace(/[&<>"']/g, char => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[char]));
+}
+function parseCookies(req) {
+  return Object.fromEntries(String(req.headers.cookie || "").split(";").map(part => {
+    const index = part.indexOf("=");
+    if (index < 0) return ["", ""];
+    return [part.slice(0, index).trim(), decodeURIComponent(part.slice(index + 1).trim())];
+  }).filter(([key]) => key));
+}
+function sessionValue(email) {
+  const issuedAt = String(Math.floor(Date.now() / 1000));
+  const payload = `${email}.${issuedAt}`;
+  const signature = crypto.createHmac("sha256", CONFIG.sessionSecret).update(payload).digest("base64url");
+  return `${payload}.${signature}`;
+}
+function validSession(value) {
+  if (!value) return false;
+  const parts = String(value).split(".");
+  if (parts.length !== 4) return false;
+  const [local, domain, issuedAt, signature] = parts;
+  const email = `${local}.${domain}`;
+  if (email !== CONFIG.demoEmail) return false;
+  const payload = `${email}.${issuedAt}`;
+  const expected = crypto.createHmac("sha256", CONFIG.sessionSecret).update(payload).digest("base64url");
+  if (Buffer.byteLength(signature) !== Buffer.byteLength(expected)) return false;
+  if (!crypto.timingSafeEqual(Buffer.from(signature), Buffer.from(expected))) return false;
+  const ageSeconds = Math.floor(Date.now() / 1000) - Number(issuedAt);
+  return Number.isFinite(ageSeconds) && ageSeconds >= 0 && ageSeconds < 7 * 24 * 60 * 60;
+}
+function setSessionCookie(req, res, value) {
+  const secure = req.headers["x-forwarded-proto"] === "https" || String(req.headers.host || "").startsWith("https://");
+  res.setHeader("Set-Cookie", `mindar_outreach_session=${encodeURIComponent(value)}; HttpOnly; SameSite=Lax; Path=/; Max-Age=604800${secure ? "; Secure" : ""}`);
+}
+function clearSessionCookie(res) {
+  res.setHeader("Set-Cookie", "mindar_outreach_session=; HttpOnly; SameSite=Lax; Path=/; Max-Age=0");
+}
+function isAuthenticated(req) {
+  return validSession(parseCookies(req).mindar_outreach_session);
+}
+function loginPage(error = "") {
+  return `<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Mindar Outreach Login</title>
+  <style>
+    * { box-sizing:border-box; } body { margin:0; min-height:100vh; display:grid; place-items:center; font:14px/1.5 Inter, ui-sans-serif, system-ui, -apple-system, sans-serif; background:#f6f8fb; color:#17202b; }
+    .card { width:min(420px, calc(100vw - 32px)); background:white; border:1px solid #e6eaf0; border-radius:12px; padding:28px; box-shadow:0 20px 60px #0f172a14; }
+    h1 { margin:0 0 6px; font-size:22px; } p { margin:0 0 20px; color:#687383; }
+    label { display:block; margin:14px 0 6px; font-weight:700; } input { width:100%; border:1px solid #d8dee8; border-radius:8px; padding:10px 11px; font:inherit; }
+    button { width:100%; margin-top:18px; border:0; border-radius:8px; padding:10px 12px; background:#2563eb; color:white; font:inherit; cursor:pointer; }
+    .error { margin:12px 0 0; padding:10px 12px; border-radius:8px; background:#fff7ed; color:#9a3412; }
+    .small { margin-top:14px; font-size:12px; color:#687383; }
+  </style>
+</head>
+<body>
+  <form class="card" method="post" action="/login">
+    <h1>Mindar YouTube Outreach Desk</h1>
+    <p>请输入演示账号后继续。</p>
+    <label for="email">Email</label>
+    <input id="email" name="email" type="email" value="${esc(CONFIG.demoEmail)}" autocomplete="username" required>
+    <label for="password">Password</label>
+    <input id="password" name="password" type="password" autocomplete="current-password" required>
+    <button type="submit">登录</button>
+    ${error ? `<div class="error">${esc(error)}</div>` : ""}
+    <div class="small">Demo account: ${esc(CONFIG.demoEmail)}</div>
+  </form>
+</body>
+</html>`;
 }
 function trackedInvite(raw, candidate) {
   if (!raw) return "";
@@ -354,6 +430,27 @@ const UI = fs.readFileSync(path.join(ROOT, "public", "index.html"), "utf8");
 const server = http.createServer(async (req, res) => {
   const url = new URL(req.url, `http://${req.headers.host || "localhost"}`);
   try {
+    if (req.method === "GET" && url.pathname === "/login") return html(res, loginPage());
+    if (req.method === "POST" && url.pathname === "/login") {
+      const chunks = [];
+      for await (const chunk of req) chunks.push(chunk);
+      const form = new URLSearchParams(Buffer.concat(chunks).toString("utf8"));
+      const email = String(form.get("email") || "").trim();
+      const password = String(form.get("password") || "");
+      if (email !== CONFIG.demoEmail || password !== CONFIG.demoPassword) {
+        return html(res, loginPage("账号或密码不正确"));
+      }
+      setSessionCookie(req, res, sessionValue(email));
+      return redirect(res, "/");
+    }
+    if (req.method === "POST" && url.pathname === "/logout") {
+      clearSessionCookie(res);
+      return redirect(res, "/login");
+    }
+    if (!isAuthenticated(req)) {
+      if (url.pathname.startsWith("/api/")) return json(res, 401, { error: "请先登录" });
+      return redirect(res, "/login");
+    }
     if (req.method === "GET" && url.pathname === "/") return html(res, UI);
     if (req.method === "GET" && url.pathname === "/api/config") {
       return json(res, 200, { dryRun: CONFIG.dryRun, sesReady: Boolean(CONFIG.sesFrom), youtubeReady: Boolean(CONFIG.youtubeKey) });

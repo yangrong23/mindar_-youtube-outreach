@@ -22,6 +22,15 @@ npm start
 
 打开 `http://127.0.0.1:61881`。
 
+默认演示登录账号：
+
+```text
+Email: 123@gmail.com
+Password: 123@gmail.com
+```
+
+可以在 `.env` 中通过 `DEMO_LOGIN_EMAIL`、`DEMO_LOGIN_PASSWORD` 和 `SESSION_SECRET` 修改。部署到公网给审核使用时，请设置固定的 `SESSION_SECRET`。
+
 真实密钥不要放入代码、截图、聊天记录或 Git。之前已经暴露的 AWS/YouTube 密钥必须先撤销并重新生成。
 
 ## SES 前置条件
