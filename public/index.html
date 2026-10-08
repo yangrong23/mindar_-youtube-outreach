@@ -1,0 +1,223 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Mindar YouTube Outreach Desk</title>
+  <style>
+    :root { color-scheme: light; --ink:#17202b; --muted:#687383; --line:#e6eaf0; --blue:#2563eb; --bg:#f6f8fb; --green:#15803d; --amber:#b45309; }
+    * { box-sizing:border-box; } body { margin:0; font:14px/1.5 Inter, ui-sans-serif, system-ui, -apple-system, sans-serif; background:var(--bg); color:var(--ink); }
+    header { background:#111827; color:white; padding:24px 32px; display:flex; justify-content:space-between; align-items:flex-start; gap:20px; }
+    header h1 { margin:0 0 5px; font-size:23px; } header p { margin:0; color:#cbd5e1; }
+    .status { display:flex; gap:8px; flex-wrap:wrap; justify-content:flex-end; } .pill { padding:6px 10px; border-radius:999px; background:#263244; color:#dbeafe; font-size:12px; }
+    main { max-width:1500px; margin:24px auto; padding:0 20px; } .panel { background:white; border:1px solid var(--line); border-radius:12px; margin-bottom:18px; box-shadow:0 2px 12px #0f172a08; }
+    .panel-head { padding:18px 20px; border-bottom:1px solid var(--line); display:flex; align-items:center; justify-content:space-between; gap:16px; } .panel h2 { margin:0; font-size:16px; }
+    .panel-body { padding:20px; } .category-grid { display:grid; grid-template-columns:repeat(4, minmax(190px,1fr)); gap:10px; } .category { display:flex; gap:9px; align-items:flex-start; padding:11px 12px; border:1px solid #d8dee8; border-radius:7px; background:#fff; cursor:pointer; } .category input { width:auto; margin-top:3px; } .category strong { display:block; font-size:13px; } .category span { display:block; color:var(--muted); font-size:12px; line-height:1.35; margin-top:2px; }
+    .custom-keywords { display:grid; grid-template-columns:repeat(4, minmax(180px,1fr)); gap:10px; margin-top:12px; }
+    input, textarea, select { width:100%; border:1px solid #d8dee8; border-radius:7px; padding:7px 8px; font:inherit; background:white; } textarea { min-height:48px; resize:vertical; }
+    button, .button { border:0; background:var(--blue); color:white; border-radius:7px; padding:7px 10px; font:inherit; cursor:pointer; text-decoration:none; display:inline-flex; align-items:center; gap:7px; } button.secondary, .button.secondary { background:#eef2f7; color:#344054; } button.danger { background:#b42318; } button:disabled { opacity:.5; cursor:not-allowed; }
+    .toolbar { display:flex; justify-content:space-between; align-items:center; gap:12px; margin:16px 0; flex-wrap:wrap; } .actions { display:flex; gap:8px; flex-wrap:wrap; }
+    .table-wrap { overflow:auto; } table { width:100%; border-collapse:collapse; min-width:1200px; } th,td { text-align:left; vertical-align:top; padding:7px 8px; border-bottom:1px solid var(--line); } th { background:#f8fafc; color:#475467; font-size:12px; position:sticky; top:0; z-index:1; } tr.selected { background:#eff6ff; }
+    .channel { display:flex; gap:8px; min-width:230px; } .channel img { width:32px; height:32px; border-radius:50%; object-fit:cover; } .channel strong { display:block; line-height:1.3; } .channel a, .video-list a { color:#2563eb; text-decoration:none; }
+    .score { font-weight:800; font-size:18px; } .score.high { color:var(--green); } .score.mid { color:var(--amber); } .tag { display:inline-block; padding:3px 7px; background:#eef2ff; color:#3730a3; border-radius:5px; font-size:12px; }
+    .cell-stack { display:grid; gap:4px; min-width:190px; } .video-list { display:grid; gap:2px; max-width:280px; max-height:86px; overflow:hidden; } .video-list a { display:block; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; } .video-list span { color:var(--muted); font-size:12px; }
+    .empty { color:var(--muted); padding:26px; text-align:center; } .notice { padding:10px 12px; border-radius:7px; background:#fff7ed; color:#9a3412; margin-top:12px; } .ok { color:var(--green); } .small { color:var(--muted); font-size:12px; }
+    .email-preview { margin:10px 0 0; padding:10px; max-height:260px; overflow:auto; white-space:pre-wrap; background:#fff; border:1px solid #fed7aa; border-radius:6px; color:var(--ink); font:12px/1.55 ui-monospace, SFMono-Regular, Menlo, monospace; }
+    .modal-backdrop { position:fixed; inset:0; z-index:20; display:none; align-items:center; justify-content:center; padding:20px; background:#0f172a80; }
+    .modal-backdrop.open { display:flex; } .modal { width:min(720px, 100%); max-height:min(760px, 90vh); overflow:auto; background:white; border-radius:12px; box-shadow:0 20px 60px #0f172a40; }
+    .modal-head { display:flex; align-items:flex-start; justify-content:space-between; gap:16px; padding:18px 20px; border-bottom:1px solid var(--line); } .modal-head h3 { margin:0; font-size:17px; }
+    .modal-body { padding:18px 20px; } .modal-body label { display:block; margin:0 0 6px; color:var(--muted); font-size:12px; } .modal-subject { margin:0 0 16px; font-weight:700; }
+    .modal-footer { display:flex; justify-content:flex-end; gap:8px; padding:14px 20px; border-top:1px solid var(--line); } .icon-button { padding:5px 9px; background:#eef2f7; color:#344054; }
+    @media (max-width:900px) { header { padding:18px; } main { padding:0 10px; } .category-grid, .custom-keywords { grid-template-columns:repeat(2,1fr); } .panel-head { align-items:flex-start; flex-direction:column; } }
+  </style>
+</head>
+<body>
+  <header>
+    <div><h1>Mindar YouTube Outreach Desk</h1><p>英语创作者发现、人工审核与 SES 邀请发送</p></div>
+    <div class="status"><span class="pill" id="youtubeStatus">YouTube: 检查中</span><span class="pill" id="sesStatus">SES: 检查中</span><span class="pill" id="dryStatus">发送模式: 检查中</span></div>
+  </header>
+  <main>
+    <section class="panel">
+      <div class="panel-head"><h2>1. 选择搜集方向</h2><span class="small">可多选；系统会自动组合英语搜索词</span></div>
+      <div class="panel-body">
+        <div class="category-grid" id="categories"></div>
+        <div class="custom-keywords" id="customKeywords"></div>
+        <div class="toolbar"><span class="small">重点寻找教师、教育工作者，以及教师可能关注的教学工具、学习方法和教育内容；筛选：2,000–20,000 粉丝，且公开文本里留有邮箱</span><button id="discover">开始搜集候选</button></div>
+        <div id="notice"></div>
+      </div>
+    </section>
+    <section class="panel">
+      <div class="panel-head"><h2>2. 候选池与人工审核</h2><div class="actions"><button class="secondary" id="export">导出 CSV</button><button class="secondary" id="refresh">刷新</button></div></div>
+      <div class="panel-body">
+        <div class="toolbar"><span class="small" id="count">尚未搜集候选</span><span class="small">规则：列表只显示已公开留下商务邮箱的候选；没有邮箱的博主不会进入列表</span></div>
+        <div class="table-wrap"><table><thead><tr><th>频道</th><th>评分</th><th>分类</th><th>近期内容</th><th>公开商务邮箱 / 来源</th><th>邀请链接</th><th>个性化说明</th><th>状态</th><th>操作</th></tr></thead><tbody id="rows"></tbody></table></div>
+      </div>
+    </section>
+    <section class="panel">
+      <div class="panel-head"><h2>3. 合规边界与状态</h2></div>
+      <div class="panel-body">
+        <p class="small">本工具不自动抓取私人邮箱、不自动群发。YouTube 只提供频道/视频元数据，邮箱需要人工从公开商务联系页确认。取消订阅、退信、投诉必须进入抑制名单。</p>
+        <p class="small">发送结果和邀请链接转化通过候选的 <code>outreach_id</code> 关联。产品注册和首次使用端需要继续保存该参数，才能分析邀请转化。</p>
+      </div>
+    </section>
+  </main>
+  <div class="modal-backdrop" id="emailModal" role="dialog" aria-modal="true" aria-labelledby="emailModalTitle">
+    <div class="modal">
+      <div class="modal-head"><div><h3 id="emailModalTitle">邮件内容预览</h3><div class="small" id="emailRecipient"></div></div><button class="icon-button" id="closeEmailModal" type="button">关闭</button></div>
+      <div class="modal-body">
+        <div id="emailModalError" class="notice" style="display:none"></div>
+        <div id="emailModalContent">
+          <label>主题</label><p class="modal-subject" id="emailSubject"></p>
+          <label>正文</label><pre class="email-preview" id="emailBody"></pre>
+        </div>
+      </div>
+      <div class="modal-footer"><button class="secondary" id="cancelEmailModal" type="button">返回修改</button><button id="sendFromModal" type="button">发送</button></div>
+    </div>
+  </div>
+<script>
+const searchCategories = [
+  {
+    id: "teachers",
+    title: "教师与教学实践",
+    description: "教师、教学法、课堂管理、教师效率",
+    keywords: ["teacher productivity", "teaching strategies", "classroom management", "teacher tools", "online teacher"]
+  },
+  {
+    id: "education_tools",
+    title: "教育科技与学习工具",
+    description: "教育软件、学习工具、AI 教学和课堂科技",
+    keywords: ["education technology", "AI tools for teachers", "classroom technology", "learning tools", "edtech review"]
+  },
+  {
+    id: "learning_support",
+    title: "学习、考试与学生支持",
+    description: "学习方法、考试准备、学生效率和知识整理",
+    keywords: ["study skills", "exam preparation", "student productivity", "learning methods", "note taking for students"]
+  },
+  {
+    id: "education_creators",
+    title: "教育内容创作者",
+    description: "教育频道、课程内容、知识讲解和教学视频",
+    keywords: ["educational YouTube channel", "education content creator", "lesson planning", "explainer videos education", "teacher YouTuber"]
+  }
+];
+const categoryBox = document.querySelector("#categories");
+searchCategories.forEach(category => {
+  categoryBox.insertAdjacentHTML("beforeend", `<label class="category"><input type="checkbox" value="${category.id}" data-category><span><strong>${category.title}</strong><span>${category.description}</span></span></label>`);
+});
+const customKeywordBox = document.querySelector("#customKeywords");
+["自定义关键词 1", "自定义关键词 2", "自定义关键词 3", "自定义关键词 4"].forEach(placeholder => {
+  const input = document.createElement("input");
+  input.placeholder = placeholder;
+  input.dataset.customKeyword = "true";
+  customKeywordBox.append(input);
+});
+const state = { candidates: [] };
+let modalCandidateId = "";
+const notice = (text, isError = false) => document.querySelector("#notice").innerHTML = text ? `<div class="${isError ? "notice" : "notice ok"}">${text}</div>` : "";
+const esc = value => String(value ?? "").replace(/[&<>"']/g, char => ({ "&":"&amp;", "<":"&lt;", ">":"&gt;", '"':"&quot;", "'":"&#39;" }[char]));
+const fmt = value => Number(value || 0).toLocaleString();
+async function api(url, options) { const res = await fetch(url, options); const data = await res.json(); if (!res.ok) throw new Error(data.error || "请求失败"); return data; }
+async function loadConfig() {
+  const config = await api("/api/config");
+  document.querySelector("#youtubeStatus").textContent = `YouTube: ${config.youtubeReady ? "已配置" : "未配置"}`;
+  document.querySelector("#sesStatus").textContent = `SES: ${config.sesReady ? "已配置" : "未配置"}`;
+  document.querySelector("#dryStatus").textContent = `发送模式: ${config.dryRun ? "Dry run" : "真实发送"}`;
+}
+function row(candidate) {
+  const level = candidate.score >= 70 ? "high" : candidate.score >= 45 ? "mid" : "";
+  const videos = (candidate.recentVideos || []).map(video => `<a href="${esc(video.url)}" target="_blank">${esc(video.title)}</a><span>${fmt(video.views)} views</span>`).join("");
+  return `<tr data-id="${candidate.id}">
+    <td><div class="channel"><img src="${esc(candidate.thumbnail)}"><div><strong>${esc(candidate.channelTitle)}</strong><a href="${esc(candidate.channelUrl)}" target="_blank">打开频道</a><div class="small">${fmt(candidate.subscribers)} subscribers · ${fmt(candidate.videoCount)} videos</div></div></div></td>
+    <td><span class="score ${level}">${candidate.score}</span><div class="small">${fmt(candidate.avgViews)} avg views</div></td>
+    <td><span class="tag">${esc(candidate.segment)}</span><div class="small">来自：${esc(candidate.query)}</div></td>
+    <td><div class="video-list">${videos || "无近期视频数据"}</div></td>
+    <td><div class="cell-stack"><input data-field="email" value="${esc(candidate.email)}" placeholder="公开商务邮箱"><input data-field="contactSource" value="${esc(candidate.contactSource)}" placeholder="来源，例如 channel About"></div></td>
+    <td><input data-field="inviteUrl" value="${esc(candidate.inviteUrl)}" placeholder="邀请码或邀请链接"></td>
+    <td><textarea data-field="personalization" placeholder="自动生成的博主定位，可编辑">${esc(candidate.personalization || candidate.positioning)}</textarea></td>
+    <td><span class="tag">${esc(candidate.status)}</span><div class="small">${(candidate.events || []).slice(-2).map(event => esc(event.type)).join(" · ")}</div></td>
+    <td><div class="cell-stack"><button class="preview" data-id="${candidate.id}">生成邮件内容</button></div></td>
+  </tr>`;
+}
+function render() {
+  document.querySelector("#count").textContent = `${state.candidates.length} 个候选；建议先确认 20 个`;
+  document.querySelector("#rows").innerHTML = state.candidates.length ? state.candidates.map(row).join("") : `<tr><td colspan="9" class="empty">输入关键词后开始搜集候选</td></tr>`;
+  document.querySelectorAll("[data-field]").forEach(input => input.addEventListener("input", event => {
+    const tr = event.target.closest("tr"); const candidate = state.candidates.find(item => item.id === tr.dataset.id);
+    if (candidate) candidate[event.target.dataset.field] = event.target.value;
+    const preview = tr.querySelector(".preview");
+    preview.disabled = false;
+  }));
+  document.querySelectorAll(".preview").forEach(button => button.addEventListener("click", async event => {
+    event.preventDefault();
+    const candidate = state.candidates.find(item => item.id === button.dataset.id);
+    const originalLabel = button.textContent;
+    modalCandidateId = candidate?.id || "";
+    button.disabled = true;
+    button.textContent = "生成中…";
+    try {
+      const result = await api("/api/email/preview", { method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify(candidate) });
+      const index = state.candidates.findIndex(item => item.id === result.candidate.id);
+      if (index >= 0) state.candidates[index] = result.candidate;
+      render();
+      openEmailModal(result.candidate, result.email);
+    } catch(error) {
+      button.disabled = false;
+      button.textContent = originalLabel;
+      openEmailModal(candidate, null, error.message);
+    }
+  }));
+}
+function openEmailModal(candidate, email, error = "") {
+  modalCandidateId = candidate?.id || "";
+  document.querySelector("#emailRecipient").textContent = candidate?.email ? `收件人：${candidate.email} · ${candidate.channelTitle || ""}` : `博主：${candidate?.channelTitle || "当前候选"}`;
+  document.querySelector("#emailModalError").textContent = error ? `暂时不能生成：${error}` : "";
+  document.querySelector("#emailModalError").style.display = error ? "block" : "none";
+  document.querySelector("#emailModalContent").style.display = email ? "block" : "none";
+  document.querySelector("#emailSubject").textContent = email?.subject || "";
+  document.querySelector("#emailBody").textContent = email?.text || "";
+  document.querySelector("#sendFromModal").style.display = email ? "inline-flex" : "none";
+  document.querySelector("#emailModal").classList.add("open");
+}
+function closeEmailModal() {
+  document.querySelector("#emailModal").classList.remove("open");
+}
+document.querySelector("#closeEmailModal").addEventListener("click", closeEmailModal);
+document.querySelector("#cancelEmailModal").addEventListener("click", closeEmailModal);
+document.querySelector("#emailModal").addEventListener("click", event => { if (event.target.id === "emailModal") closeEmailModal(); });
+document.querySelector("#sendFromModal").addEventListener("click", async () => {
+  const button = document.querySelector("#sendFromModal");
+  const candidate = state.candidates.find(item => item.id === modalCandidateId);
+  if (!candidate) return;
+  button.disabled = true;
+  button.textContent = "发送中…";
+  try {
+    const result = await api("/api/send", { method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify({id: candidate.id}) });
+    closeEmailModal();
+    notice(result.candidate.status === "approved_dry_run" ? "Dry run 已生成邮件，未真实发送。确认无误后将 .env 的 OUTREACH_DRY_RUN 改为 false。" : "邮件已交给 SES。");
+    await load();
+  } catch(error) {
+    document.querySelector("#emailModalError").textContent = `发送失败：${error.message}`;
+    document.querySelector("#emailModalError").style.display = "block";
+  } finally {
+    button.disabled = false;
+    button.textContent = "发送";
+  }
+});
+async function load() { state.candidates = await api("/api/candidates"); render(); }
+document.querySelector("#discover").addEventListener("click", async () => {
+  const selectedIds = [...document.querySelectorAll("[data-category]:checked")].map(input => input.value);
+  const keywords = [
+    ...searchCategories.filter(category => selectedIds.includes(category.id)).flatMap(category => category.keywords),
+    ...[...document.querySelectorAll("[data-custom-keyword]")].map(input => input.value.trim()).filter(Boolean)
+  ];
+  if (!keywords.length) return notice("至少输入一个关键词。", true);
+  const button = document.querySelector("#discover"); button.disabled = true; button.textContent = "搜集中...";
+  try { const result = await api("/api/discover", { method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify({keywords}) }); notice(`已发现 ${result.count} 个频道。请人工确认候选和公开商务邮箱。`); await load(); } catch(error) { notice(error.message, true); } finally { button.disabled = false; button.textContent = "开始搜集候选"; }
+});
+document.querySelector("#refresh").addEventListener("click", load);
+document.querySelector("#export").addEventListener("click", () => location.href = "/api/export.csv");
+loadConfig().catch(error => notice(error.message, true)); load();
+</script>
+</body>
+</html>
