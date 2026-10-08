@@ -23,6 +23,8 @@
     .score { font-weight:800; font-size:18px; } .score.high { color:var(--green); } .score.mid { color:var(--amber); } .tag { display:inline-block; padding:3px 7px; background:#eef2ff; color:#3730a3; border-radius:5px; font-size:12px; }
     .cell-stack { display:grid; gap:4px; min-width:190px; } .video-list { display:grid; gap:2px; max-width:280px; max-height:86px; overflow:hidden; } .video-list a { display:block; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; } .video-list span { color:var(--muted); font-size:12px; }
     .empty { color:var(--muted); padding:26px; text-align:center; } .notice { padding:10px 12px; border-radius:7px; background:#fff7ed; color:#9a3412; margin-top:12px; } .ok { color:var(--green); } .small { color:var(--muted); font-size:12px; }
+    .compliance-links { display:flex; flex-wrap:wrap; gap:10px 14px; align-items:center; margin-top:12px; color:var(--muted); font-size:12px; }
+    .compliance-links a { color:#2563eb; text-decoration:none; font-weight:700; }
     .email-preview { margin:10px 0 0; padding:10px; max-height:260px; overflow:auto; white-space:pre-wrap; background:#fff; border:1px solid #fed7aa; border-radius:6px; color:var(--ink); font:12px/1.55 ui-monospace, SFMono-Regular, Menlo, monospace; }
     .modal-backdrop { position:fixed; inset:0; z-index:20; display:none; align-items:center; justify-content:center; padding:20px; background:#0f172a80; }
     .modal-backdrop.open { display:flex; } .modal { width:min(720px, 100%); max-height:min(760px, 90vh); overflow:auto; background:white; border-radius:12px; box-shadow:0 20px 60px #0f172a40; }
@@ -57,8 +59,16 @@
     <section class="panel">
       <div class="panel-head"><h2>3. 合规边界与状态</h2></div>
       <div class="panel-body">
+        <p class="small">本工具使用 YouTube Data API Services 搜索公开 YouTube 频道与视频元数据，用于人工发现教育、创作者和知识管理相关合作对象。</p>
         <p class="small">本工具不自动抓取私人邮箱、不自动群发。YouTube 只提供频道/视频元数据，邮箱需要人工从公开商务联系页确认。取消订阅、退信、投诉必须进入抑制名单。</p>
         <p class="small">发送结果和邀请链接转化通过候选的 <code>outreach_id</code> 关联。产品注册和首次使用端需要继续保存该参数，才能分析邀请转化。</p>
+        <div class="compliance-links" aria-label="合规链接">
+          <span>Compliance:</span>
+          <a href="https://web.mindar.ai/privacy" target="_blank" rel="noopener">Privacy Policy</a>
+          <a href="https://web.mindar.ai/terms" target="_blank" rel="noopener">Terms of Service</a>
+          <a href="https://policies.google.com/privacy" target="_blank" rel="noopener">Google Privacy Policy</a>
+          <a href="https://developers.google.com/youtube/terms/api-services-terms-of-service" target="_blank" rel="noopener">YouTube API Services Terms</a>
+        </div>
       </div>
     </section>
   </main>
