@@ -38,11 +38,11 @@
   </header>
   <main>
     <section class="panel">
-      <div class="panel-head"><h2>1. 选择搜集方向</h2><span class="small">可多选；系统会自动组合英语搜索词</span></div>
+      <div class="panel-head"><h2>1. 选择搜集方向</h2><span class="small">可多选；系统会自动组合英语搜索词，单次最多使用前 24 个</span></div>
       <div class="panel-body">
         <div class="category-grid" id="categories"></div>
         <div class="custom-keywords" id="customKeywords"></div>
-        <div class="toolbar"><span class="small">重点寻找教师、教育工作者，以及教师可能关注的教学工具、学习方法和教育内容；筛选：2,000–20,000 粉丝，且公开文本里留有邮箱</span><button id="discover">开始搜集候选</button></div>
+        <div class="toolbar"><span class="small">重点寻找 NotebookLM/AI 学习工具、知识管理、内容再生产、课程创作者、研究者和备考类频道；筛选：2,000–20,000 粉丝，且公开文本里留有邮箱</span><button id="discover">开始搜集候选</button></div>
         <div id="notice"></div>
       </div>
     </section>
@@ -77,28 +77,40 @@
 <script>
 const searchCategories = [
   {
-    id: "teachers",
-    title: "教师与教学实践",
-    description: "教师、教学法、课堂管理、教师效率",
-    keywords: ["teacher productivity", "teaching strategies", "classroom management", "teacher tools", "online teacher"]
+    id: "notebooklm_ai_study_tools",
+    title: "NotebookLM 与 AI 学习工具",
+    description: "NotebookLM 教程、替代品、AI 学习助手和笔记生成产物",
+    keywords: ["NotebookLM tutorial", "NotebookLM for students", "NotebookLM alternatives", "AI study assistant", "AI notes to podcast", "AI notes to presentation"]
   },
   {
-    id: "education_tools",
-    title: "教育科技与学习工具",
-    description: "教育软件、学习工具、AI 教学和课堂科技",
-    keywords: ["education technology", "AI tools for teachers", "classroom technology", "learning tools", "edtech review"]
+    id: "knowledge_management_study_notes",
+    title: "学习资料整理与知识管理",
+    description: "学习笔记、数字笔记、Second Brain、Obsidian/Notion/PKM 工作流",
+    keywords: ["study notes", "digital note taking", "knowledge management", "second brain", "Obsidian study workflow", "Notion study system", "PKM for students"]
   },
   {
-    id: "learning_support",
-    title: "学习、考试与学生支持",
-    description: "学习方法、考试准备、学生效率和知识整理",
-    keywords: ["study skills", "exam preparation", "student productivity", "learning methods", "note taking for students"]
+    id: "ai_content_repurposing",
+    title: "AI 内容再生产",
+    description: "一份材料生成多种内容：PPT、视频、博客、教育内容和内容工作流",
+    keywords: ["repurpose content with AI", "turn notes into content", "AI content workflow", "AI presentation maker", "AI video generator for education", "AI blog from notes"]
   },
   {
-    id: "education_creators",
-    title: "教育内容创作者",
-    description: "教育频道、课程内容、知识讲解和教学视频",
-    keywords: ["educational YouTube channel", "education content creator", "lesson planning", "explainer videos education", "teacher YouTuber"]
+    id: "course_creators_instructional_design",
+    title: "课程创作者与教学设计",
+    description: "在线课程、教学设计、教育内容创作者、AI 教学和课程材料制作",
+    keywords: ["online course creator", "course creation workflow", "instructional design", "educational content creator", "teaching with AI", "create lesson materials"]
+  },
+  {
+    id: "research_academic_workflows",
+    title: "研究者与学术资料处理",
+    description: "文献综述、论文总结、学术写作、研究笔记和博士效率",
+    keywords: ["literature review workflow", "research paper summary", "AI research assistant", "academic writing tools", "research notes", "PhD productivity"]
+  },
+  {
+    id: "student_productivity_exam_prep",
+    title: "学生效率与考试备考",
+    description: "AI 学习、备考、闪卡、测验、学习指南和主动回忆",
+    keywords: ["study with AI", "exam prep AI", "flashcards from notes", "quiz generator", "study guide generator", "active recall"]
   }
 ];
 const categoryBox = document.querySelector("#categories");
@@ -106,7 +118,7 @@ searchCategories.forEach(category => {
   categoryBox.insertAdjacentHTML("beforeend", `<label class="category"><input type="checkbox" value="${category.id}" data-category><span><strong>${category.title}</strong><span>${category.description}</span></span></label>`);
 });
 const customKeywordBox = document.querySelector("#customKeywords");
-["自定义关键词 1", "自定义关键词 2", "自定义关键词 3", "自定义关键词 4"].forEach(placeholder => {
+["YouTube 网页可搜索的英文关键词 1", "YouTube 网页可搜索的英文关键词 2", "YouTube 网页可搜索的英文关键词 3", "YouTube 网页可搜索的英文关键词 4"].forEach(placeholder => {
   const input = document.createElement("input");
   input.placeholder = placeholder;
   input.dataset.customKeyword = "true";
